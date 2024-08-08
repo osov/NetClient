@@ -1,0 +1,160 @@
+local ____lualib = require("lualib_bundle")
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local do_scroll, add_message, create_fnc, init_chat, update_input, send_text, time_scrolled, last_msg_time, messages, input_text
+local druid = require("druid.druid")
+local data_list = require("druid.extended.data_list")
+local ____utils = require("utils.utils")
+local set_text = ____utils.set_text
+function do_scroll(_this, req)
+    if req == nil then
+        req = false
+    end
+    if System.now() - time_scrolled < 0.2 and not req then
+        return
+    end
+    time_scrolled = System.now()
+    if _this.data_list.last_index >= #messages - 1 or req then
+        _this.data_list:scroll_to_index(#messages - 1)
+    end
+end
+function add_message(_this, msg)
+    messages[#messages + 1] = __TS__ObjectAssign({}, msg)
+    if #messages > 10 then
+        table.remove(messages, 1)
+    end
+    _this.data_list:set_data(messages)
+    if System.now() - last_msg_time < 0.2 then
+        return
+    end
+    last_msg_time = System.now()
+    do_scroll(_this)
+end
+function create_fnc(_this, data, index, data_list)
+    local item = gui.clone_tree(gui.get_node("chat_message"))
+    gui.set_text(item.nick, data.nick)
+    gui.set_text(item.text, data.text)
+    return item.chat_message
+end
+function init_chat(_this)
+    local item_node_name = "chat_message"
+    local node_content = "content"
+    _this.scroll = _this.druid:new_scroll("scroll", node_content)
+    _this.scroll:set_horizontal_scroll(false)
+    _this.static_grid = _this.druid:new_static_grid(node_content, item_node_name, 1)
+    _this.data_list = _this.druid:new_data_list(_this.scroll, _this.static_grid, create_fnc)
+    _this.data_list:set_data(messages)
+    messages = {}
+end
+function update_input()
+    set_text("input_text", input_text)
+end
+function send_text()
+    WsClient.send_message("CS_Send_Chat", {text = input_text})
+    input_text = ""
+    update_input()
+end
+local KeyCodes = {
+    enter = hash("key_enter"),
+    backspace = hash("key_backspace"),
+    text = hash("text")
+}
+local function get_uid()
+    local tmp_soc_id = Storage.get_string("tmp_soc_id", "")
+    if tmp_soc_id == "" then
+        local id = (System.platform .. "-") .. tostring(System.now())
+        Storage.set("tmp_soc_id", id)
+        tmp_soc_id = id
+    end
+    return tmp_soc_id
+end
+function ____exports.init(_this)
+    local on_message_socket
+    function on_message_socket(id_message, _message)
+        log("ws data:", id_message, _message)
+        if id_message == "SC_Chat_Messages" then
+            local messages = _message
+            do
+                local i = 0
+                while i < #messages do
+                    add_message(_this, messages[i + 1])
+                    i = i + 1
+                end
+            end
+        end
+        if id_message == "SC_Chat_Message" then
+            local message = _message
+            add_message(_this, message)
+        end
+    end
+    msg.post(".", "acquire_input_focus")
+    druid.register("data_list", data_list)
+    Manager.init_script()
+    _this.druid = druid.new(_this)
+    _this.druid:new_button("btnSend", send_text)
+    WsClient.connect("ws://localhost:3000")
+    EventBus.on(
+        "ON_WS_CONNECTED",
+        function(e)
+            log("connected", e)
+            local nick = "test"
+            if System.platform == "HTML5" then
+                nick = html5.run("new URL(location).searchParams.get('nick')||''")
+            end
+            WsClient.send_message(
+                "CS_Connect",
+                {
+                    nick = nick,
+                    id_room = 1,
+                    id_session = get_uid()
+                }
+            )
+        end
+    )
+    EventBus.on(
+        "ON_WS_DATA",
+        function(e)
+            local data = json.decode(e.data)
+            on_message_socket(data.id, data.message)
+        end
+    )
+    init_chat(_this)
+end
+time_scrolled = 0
+last_msg_time = 0
+messages = {}
+input_text = ""
+function ____exports.on_input(self, action_id, action)
+    self.druid:on_input(action_id, action)
+    if action_id == KeyCodes.backspace and action.repeated then
+        if string.len(input_text) > 0 then
+            input_text = string.sub(
+                input_text,
+                1,
+                string.len(input_text) - 1
+            )
+            update_input()
+        end
+    elseif action_id == KeyCodes.enter and action.pressed then
+        send_text()
+    elseif action_id == KeyCodes.text then
+        input_text = input_text .. tostring(action.text)
+        update_input()
+    end
+end
+function ____exports.update(self, dt)
+    self.druid:update(dt)
+end
+function ____exports.on_message(self, message_id, message, sender)
+    self.druid:on_message(message_id, message, sender)
+end
+function ____exports.final(self)
+    Manager.final_script()
+    self.druid:final()
+end
+init = ____exports.init
+on_input = ____exports.on_input
+update = ____exports.update
+on_message = ____exports.on_message
+final = ____exports.final
+

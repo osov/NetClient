@@ -1,0 +1,262 @@
+script: "/menu/menu.gui_script"
+fonts {
+  name: "myFont"
+  font: "/assets/myFont.font"
+}
+textures {
+  name: "UI"
+  texture: "/assets/ui/UI.atlas"
+}
+nodes {
+  position {
+    x: 79.92862
+    y: 1176.2839
+  }
+  size {
+    x: 350.0
+    y: 80.0
+  }
+  type: TYPE_BOX
+  id: "chat_message"
+  inherit_alpha: true
+  visible: false
+}
+nodes {
+  size {
+    x: 340.0
+    y: 70.0
+  }
+  type: TYPE_BOX
+  id: "block"
+  parent: "chat_message"
+  slice9 {
+    x: 15.0
+    y: 10.0
+    z: 15.0
+    w: 10.0
+  }
+}
+nodes {
+  position {
+    x: 3.464103
+    y: 26.0
+  }
+  scale {
+    x: 0.764327
+    y: 0.764327
+    z: 0.764327
+  }
+  size {
+    x: 350.0
+    y: 30.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_TEXT
+  text: "\320\235\320\270\320\272 \321\216\320\267\320\265\321\200\320\260"
+  font: "myFont"
+  id: "nick"
+  outline {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+  shadow {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+  parent: "block"
+  inherit_alpha: true
+  text_leading: 0.6
+}
+nodes {
+  position {
+    x: -157.48344
+    y: 19.0
+  }
+  size {
+    x: 270.0
+    y: 50.0
+  }
+  color {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  type: TYPE_TEXT
+  text: "\321\202\320\265\320\272\321\201\321\202 \321\216\320\267\320\265\321\200"
+  font: "myFont"
+  id: "text"
+  pivot: PIVOT_NW
+  outline {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+  shadow {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+  line_break: true
+  parent: "block"
+  inherit_alpha: true
+  text_leading: 0.7
+}
+nodes {
+  position {
+    x: 484.08133
+    y: 939.16504
+  }
+  size {
+    x: 450.0
+    y: 800.0
+  }
+  color {
+    x: 0.314
+    y: 0.294
+    z: 0.224
+  }
+  type: TYPE_BOX
+  id: "chat_block"
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_TOP
+  pivot: PIVOT_NE
+  inherit_alpha: true
+  slice9 {
+    x: 15.0
+    y: 10.0
+    z: 15.0
+    w: 10.0
+  }
+  alpha: 0.91
+}
+nodes {
+  position {
+    x: -225.0
+    y: -5.0
+  }
+  size {
+    x: 450.0
+    y: 800.0
+  }
+  color {
+    y: 0.4
+    z: 0.4
+  }
+  type: TYPE_BOX
+  id: "scroll"
+  pivot: PIVOT_N
+  parent: "chat_block"
+  inherit_alpha: true
+  clipping_mode: CLIPPING_MODE_STENCIL
+  alpha: 0.0
+}
+nodes {
+  size {
+    x: 450.0
+    y: 800.0
+  }
+  color {
+    x: 0.2
+    y: 0.4
+    z: 0.2
+  }
+  type: TYPE_BOX
+  id: "content"
+  pivot: PIVOT_N
+  parent: "scroll"
+  inherit_alpha: true
+  alpha: 0.0
+}
+nodes {
+  position {
+    x: -60.54974
+    y: -868.09406
+  }
+  scale {
+    x: 0.347144
+    y: 0.347144
+    z: 0.347144
+  }
+  size {
+    x: 200.0
+    y: 100.0
+  }
+  type: TYPE_BOX
+  texture: "UI/btn_b"
+  id: "btnSend"
+  parent: "chat_block"
+}
+nodes {
+  scale {
+    x: 1.78
+    y: 1.78
+    z: 1.78
+  }
+  size {
+    x: 100.0
+    y: 25.0
+  }
+  type: TYPE_TEXT
+  text: "send"
+  font: "myFont"
+  id: "text1"
+  parent: "btnSend"
+  inherit_alpha: true
+}
+nodes {
+  position {
+    x: 257.182
+    y: 72.73077
+  }
+  size {
+    x: 200.0
+    y: 48.0
+  }
+  color {
+    x: 0.302
+    y: 0.302
+    z: 0.302
+  }
+  type: TYPE_BOX
+  id: "button"
+  inherit_alpha: true
+  slice9 {
+    x: 10.0
+    y: 10.0
+    z: 10.0
+    w: 10.0
+  }
+}
+nodes {
+  scale {
+    x: 0.7
+    y: 0.7
+  }
+  size {
+    x: 220.0
+    y: 30.0
+  }
+  type: TYPE_TEXT
+  font: "myFont"
+  id: "input_text"
+  yanchor: YANCHOR_TOP
+  outline {
+    z: 0.5019608
+  }
+  shadow {
+    z: 0.5019608
+  }
+  line_break: true
+  parent: "button"
+  inherit_alpha: true
+  text_leading: 0.7
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
+max_nodes: 350
